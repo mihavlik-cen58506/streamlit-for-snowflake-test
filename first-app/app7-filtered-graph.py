@@ -1,9 +1,8 @@
 import urllib.parse
 from io import StringIO
 
-import streamlit as st
-
 import pandas as pd
+import streamlit as st
 
 # DYNAMIC FILTERING OF GRAPH
 
@@ -35,7 +34,7 @@ cols = list(df_orig.columns)  # get the column names
 
 child = st.sidebar.selectbox("Select the child column", cols, index=0)
 parent = st.sidebar.selectbox("Select the parent column", cols, index=1)
-df = df_orig[[child, parent]]  # Chart will filter based on chosen columns
+df = df_orig[[child, parent]]  # Chart will filter based on choosen columns
 
 tabs[0].dataframe(df_orig)  # show the dataframe in the first tab
 slider = st.slider("Pick a number", 0, 10, 5)
