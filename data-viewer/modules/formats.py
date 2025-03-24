@@ -16,47 +16,28 @@ def getJson(df):
     }
     """
 
-    # collect all nodes
     nodes = {}
+
+    # Collect all nodes
     for _, row in df.iterrows():
         name = row.iloc[0]
         nodes[name] = {"name": name}
 
-    if df.empty:
-        return {}
-
-    # collect all nodes
-    nodes = {}
-    for _, row in df.iterrows():
-        name = row.iloc[0]
-        if pd.isna(name):
-            continue
-        nodes[name] = {"name": name}
-
-    # move children under parents, and detect root
+    # Move children under parents, replacing missing parents with "NaN"
     root = None
     for _, row in df.iterrows():
-        if pd.isna(row.iloc[0]):
-            continue
+        node = nodes[row.iloc[0]]
+        parent_name = row.iloc[1] if pd.notna(row.iloc[1]) else "NaN"
 
-        node = nodes.get(row.iloc[0])
-        parent_name = row.iloc[1] if len(row) > 1 else None
-        isRoot = pd.isna(parent_name)
-
-        if isRoot:
-            root = node
+        if parent_name == "NaN":
+            root = node if root is None else root  # Assign first root found
         else:
-            parent = nodes.get(parent_name)
-            if parent:
-                if "children" not in parent:
-                    parent["children"] = []
-                parent["children"].append(node)
-            else:
-                print(
-                    f"Warning: Parent '{parent_name}' not found for child '{row.iloc[0]}'"
-                )
+            parent = nodes.get(parent_name, {"name": "NaN"})
+            if "children" not in parent:
+                parent["children"] = []
+            parent["children"].append(node)
 
-    return root or {}
+    return root if root else {"name": "NaN"}
 
 
 def getXml(node, level=0):
@@ -76,9 +57,6 @@ def getXml(node, level=0):
     ...
     """
 
-    if not node:
-        return ""  # Return empty string if node is None or empty
-
     # add <object> and <name>
     indent0 = indent * level
     indent1 = indent0 + indent
@@ -88,7 +66,7 @@ def getXml(node, level=0):
     s += f"{indent1}<name>{node['name']}</name>\n"
 
     # recursively append the inner children
-    if "children" in node and node["children"]:
+    if "children" in node:
         s += f"{indent1}<children>\n"
         for child in node["children"]:
             s += getXml(child, level + 2)
@@ -108,14 +86,13 @@ def getYaml(node, level=0, first=False):
     ...
     """
 
-    if not node:
-        return ""
-
     indent0 = indent * level
     indent1 = indent0 + "  "
 
     s = f"{node['name']}\n"
-    if "children" in node and node["children"]:
+
+    # recursively append the inner children
+    if "children" in node:
         first = True
         for child in node["children"]:
             s += f"{indent0}- " if first else indent1
@@ -134,18 +111,11 @@ def getPath(node, nodes, path=""):
     ...]
     """
 
-    if nodes is None:
-        nodes = []
-
-    if not node:
-        return nodes
-
     # append full path to the top of the current node
-    path += node["name"] if not path else f'.{node["name"]}'
+    path += node["name"] if len(path) == 0 else f'.{node["name"]}'
     nodes.append({"id": path})
 
-    if "children" in node and node["children"]:
+    if "children" in node:
         for child in node["children"]:
-            getPath(child, nodes, path)
-
+            nodes = getPath(child, nodes, path)
     return nodes
