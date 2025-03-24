@@ -16,28 +16,26 @@ def getJson(df):
     }
     """
 
+    # collect all nodes
     nodes = {}
-
-    # Collect all nodes
     for _, row in df.iterrows():
         name = row.iloc[0]
         nodes[name] = {"name": name}
 
-    # Move children under parents, replacing missing parents with "NaN"
+    # move children under parents, and detect root
     root = None
     for _, row in df.iterrows():
         node = nodes[row.iloc[0]]
-        parent_name = row.iloc[1] if pd.notna(row.iloc[1]) else "NaN"
-
-        if parent_name == "NaN":
-            root = node if root is None else root  # Assign first root found
+        isRoot = pd.isna(row.iloc[1])
+        if isRoot:
+            root = node
         else:
-            parent = nodes.get(parent_name, {"name": "NaN"})
+            parent = nodes[row.iloc[1]]
             if "children" not in parent:
                 parent["children"] = []
             parent["children"].append(node)
 
-    return root if root else {"name": "NaN"}
+    return root
 
 
 def getXml(node, level=0):

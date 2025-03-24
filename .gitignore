@@ -6,10 +6,13 @@ venv/
 *.exe
 *.spec
 *.conf
+*.zip
 
 **/lib/
 **/__pycache__
 **/node_modules
 **/package-lock.json
-**/.streamlit/secrets.toml
+**/.streamlit
 **/yolo
+**/yolov
+**/TRAIN_DATASET.CSV

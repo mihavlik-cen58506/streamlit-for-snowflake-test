@@ -16,8 +16,8 @@ st.set_page_config(layout="wide")
 st.title("Hierarchical Data Viewer")
 st.caption("Display your hierarchical data with charts and graphs.")
 
-auth.check_password()
-# auth.check_user_and_password()
+# auth.check_password()
+auth.check_user_and_password()
 
 
 def getSessionId():
@@ -45,7 +45,6 @@ with st.sidebar:
 
     child = st.selectbox("Child Column Name", cols, index=0)
     parent = st.selectbox("Parent Column Name", cols, index=1)
-    # based on choosen values from selectboxes create a new dataframe
     df = df_orig[[child, parent]]
 
     # st.sidebar.markdown(f"User: {st.experimental_user.email}")
@@ -120,48 +119,3 @@ with tabAnim:
 
     with open(filename, "r", encoding="utf-8") as f:
         components.html(f.read(), height=2200, width=1000)
-
-if st.toggle("Read documentation"):
-    st.write(
-        """
-This Streamlit application provides a hierarchical data viewer with various visualization options.
-
-Modules:
-- json: For handling JSON data.
-- uuid: For generating unique session IDs.
-- StringIO: For handling in-memory file objects.
-- auth: Custom module for authentication (commented out).
-- modules.animated: Custom module for animated visualizations.
-- modules.charts: Custom module for chart visualizations.
-- modules.formats: Custom module for data format conversions.
-- modules.graphs: Custom module for graph visualizations.
-- modules.utils: Custom utility functions.
-- pandas: For data manipulation and analysis.
-- streamlit: For creating the web application.
-- streamlit.components.v1: For embedding custom HTML components.
-
-Functions:
-- getSessionId(): Generates and returns a unique session ID.
-- loadFile(session_id, filename): Loads a CSV file and converts its data types.
-
-Streamlit Components:
-- st.set_page_config(): Sets the page layout to wide.
-- st.title(): Sets the title of the application.
-- st.caption(): Sets a caption for the application.
-- st.sidebar: Contains file uploader and column selection widgets.
-- st.tabs(): Creates tabs for different views (Source, Format, Graph, Chart, Animated).
-- st.dataframe(): Displays the original dataframe.
-- st.selectbox(): Creates dropdown menus for selecting data formats and chart types.
-- st.code(): Displays code snippets in various formats (JSON, XML, YAML).
-- st.json(): Displays JSON data.
-- st.link_button(): Creates a button linking to an online graph visualization.
-- st.graphviz_chart(): Displays a Graphviz chart.
-- st.plotly_chart(): Displays a Plotly chart.
-- components.html(): Embeds custom HTML content.
-
-Usage:
-1. Upload a CSV file via the sidebar.
-2. Select the child and parent columns for hierarchical data.
-3. View the data in different formats and visualizations using the tabs.
-"""
-    )
